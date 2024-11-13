@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <h3>User CRUD Operation</h3>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <form action="#" name="local_form">
+                    <div class="mb-3">
+                        <input type="hidden" name="uid" id="uid">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" aria-describedby="emailHelp"
+                            placeholder="Enter Name" name="name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="name">Age</label>
+                        <input type="number" class="form-control" id="age" aria-describedby="emailHelp"
+                            placeholder="Enter Age">
+                    </div>
+                    <div class="mb-3">
+                        <label for="name">Qualification</label>
+                        <input type="text" class="form-control" id="qual" aria-describedby="emailHelp"
+                            placeholder="Enter Qualification"><br>
+                    </div>
+                    <div class="mb-3">
+                        <button class=" btn btn-success" onclick="saveData()">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <table class="table" id="usertable">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Age</th>
+                            <th scope="col">Qualification</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script>
+        let data = [];
+
+        const saveData = () => {
+            let getData = JSON.parse(localStorage.getItem('userdata'))
+
+            let len = getData != null && getData.length > 0 ? getData.length + 1 : 1
+
+            let nm = $("input[name = 'name']").val()
+            let age = $('#age').val()
+            let qual = $('#qual').val()
+            let id = $('#uid').val()
+
+            let obj = {
+                id: len,
+                name: nm,
+                age: age,
+                qual: qual
+            }
+            if (id != '') {
+                let editData = getData.map((i) => {
+                    if (i.id == id) {
+                        i.name = nm
+                        i.age = age
+                        i.qual = qual
+                    }
+                    return i
+                })
+                data = editData
+            } else {
+                //insert
+                data.push(obj)
+            }
+            localStorage.setItem('userdata', JSON.stringify(data))
+            document.local_form.reset()
+            display()
+        }
+
+        const display = () => {
+            let localData = JSON.parse(localStorage.getItem('userdata'))
+            let tr = ''
+            console.log(parseInt(localData.id))
+            // localData != null ? $('#usertable').show() : $('#usertable').hide()
+            if (localData != null) {
+                localData.map((i) => {
+                    tr += `<tr>
+                    <td>${i.id}</td>
+                    <td>${i.name == '' ? '-' : i.name}</td>
+                    <td>${i.age == '' ? '-' : i.age}</td>
+                    <td>${i.qual == '' ? '-' : i.qual}</td>
+                    <td><button class="btn btn-info" onclick="editData(${i.id})">Edit</button>&nbsp;&nbsp;
+                        <button class="btn btn-danger" onclick="delData(${i.id})">Delete</button></td>
+                    </tr>`
+                })
+                document.getElementById('uTable').innerHTML = tr
+            }
+
+
+        }
+        display()
+        const delData = (id) => {
+            let localData = JSON.parse(localStorage.getItem('userdata'))
+            let res = localData.filter((i) => {
+                return i.id != id
+            })
+            // console.log(res)
+            localStorage.setItem('userdata', JSON.stringify(res))
+            display()
+        }
+
+        const editData = (id) => {
+            let localData = JSON.parse(localStorage.getItem('userdata'))
+            let res = localData.find((i) => {
+                return i.id == id
+            })
+            // console.log(res)
+            $("input[name = 'name']").val(res.name)
+            $('#age').val(res.age)
+            $('#qual').val(res.qual)
+            $('#uid').val(res.id)
+        }
+
+    </script>
+</body>
+
+</html>
